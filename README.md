@@ -14,6 +14,11 @@ cd webmidi_playground
 python -m http.server 8000
 http://localhost:8000
 ```
+
+### macOS and Linux (not tested)
+
+On macOS, you'll likely want to use [IAC Driver](https://support.apple.com/en-gb/guide/audio-midi-setup/ams1013/mac) (available through Audio MIDI Setup) instead of loopMIDI to create a virtual MIDI port. Linux users have a few options depending on your setup: if you're running JACK, you can create a virtual MIDI port through QjackCtl, or use [Alsa Loopback](https://www.alsa-project.org/) for a more straightforward approach. The playground looks for ports containing "loopMIDI" or "IAC" in the name, so you might need to tweak the port detection code if your virtual port is named something else.
+
 ### Links
 
 - https://www.w3.org/TR/webmidi/
