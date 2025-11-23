@@ -1,6 +1,6 @@
 # Web MIDI playground
 
-A little Web MIDI playground for testing and evaluating connecting a browser to a DAW/synth etc. and then using Javascript to control it.
+A little web MIDI playground for testing and evaluating connecting a browser to a DAW/synth etc. and then using Javascript to control it.
 
 I used Windows and Bitwig:-
 
