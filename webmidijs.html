@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebMidi.js Sequencer Playground</title>
+  <style>
+    * {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      margin: 20px;
+      max-width: 1000px;
+      line-height: 1.6;
+      background: #fafafa;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .section {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border-left: 4px solid #0066cc;
+    }
+
+    .section h2 {
+      margin-top: 0;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 8px 16px;
+      margin: 5px 5px 5px 0;
+      font-size: 14px;
+      cursor: pointer;
+      background: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #0052a3;
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: #666;
+    }
+
+    button.secondary:hover {
+      background: #444;
+    }
+
+    button.stop {
+      background: #cc3333;
+    }
+
+    button.stop:hover {
+      background: #aa2222;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    #output {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      color: #333;
+    }
+
+    .info-text {
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ccc;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .status-indicator.active {
+      background: #00cc00;
+    }
+
+    .sequence-display {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 10px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    .sequence-step {
+      padding: 8px;
+      margin: 5px 0;
+      background: white;
+      border-left: 3px solid #0066cc;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <h1>WebMidi.js Sequencer Playground<span class="status-indicator" id="statusIndicator"></span></h1>
+
+  <div class="section">
+    <h2>Connection</h2>
+    <button onclick="initWebMIDI()">Initialize WebMIDI</button>
+    <div class="control-group" style="margin-top: 15px;">
+      <label>Select Output Device</label>
+      <select id="outputSelect" disabled onchange="selectOutput()">
+        <option value="">No devices available</option>
+      </select>
+    </div>
+    <div id="output"></div>
+  </div>
+
+  <div class="section">
+    <h2>Simple Chord Test</h2>
+    <div class="controls">
+      <div class="control-group">
+        <label>Root Note (C3=48, C4=60)</label>
+        <input type="number" id="testRoot" min="0" max="127" value="60">
+      </div>
+      <div class="control-group">
+        <label>Channel (1-16)</label>
+        <input type="number" id="testChannel" min="1" max="16" value="1">
+      </div>
+      <div class="control-group">
+        <label>Velocity (0-1)</label>
+        <input type="number" id="testVelocity" min="0" max="1" step="0.1" value="0.8">
+      </div>
+      <div class="control-group">
+        <label>Duration (ms)</label>
+        <input type="number" id="testDuration" min="100" max="5000" value="1000">
+      </div>
+    </div>
+    <div class="button-row">
+      <button onclick="playTestChord('major')">C Major</button>
+      <button onclick="playTestChord('minor')">C Minor</button>
+      <button onclick="playTestChord('major7')">C Maj7</button>
+      <button onclick="playTestChord('minor7')">C Min7</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Chord Sequence Examples</h2>
+    <div class="button-row">
+      <button onclick="playSimpleSequence()">Simple Progression (I-IV-V-I)</button>
+      <button onclick="playJazzSequence()">Jazz Progression (ii-V-I)</button>
+      <button onclick="playMultiChannelSequence()">Multi-Channel Demo</button>
+      <button onclick="playVelocityDemo()">Velocity Variation Demo</button>
+      <button onclick="stopAllNotes()" class="stop">Stop All Notes</button>
+    </div>
+    <div class="sequence-display" id="sequenceDisplay">
+      Sequence output will appear here...
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Custom Sequence Builder</h2>
+    <div class="controls">
+      <div class="control-group">
+        <label>Tempo (BPM)</label>
+        <input type="number" id="tempo" min="40" max="240" value="120">
+      </div>
+      <div class="control-group">
+        <label>Base Note</label>
+        <input type="number" id="baseNote" min="0" max="127" value="60">
+      </div>
+    </div>
+    <div class="info-text">
+      Use the examples above to see how chord sequences work with WebMidi.js
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/webmidi@latest/dist/iife/webmidi.iife.js"></script>
+  <script type="text/javascript" src="webmidijs.js"></script>
+</body>
+</html>

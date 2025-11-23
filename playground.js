@@ -23,16 +23,8 @@ function updateStatus() {
 
 async function initMIDI() {
   try {
-    midiAccess = await navigator.requestMIDIAccess({ sysexEnabled: true });
+    midiAccess = await navigator.requestMIDIAccess();
     log('✓ MIDI access granted');
-  
-    // Check if SysEx was actually enabled
-    if (midiAccess.sysexEnabled) {
-      log('✓ SysEx enabled');
-    } 
-    else {
-      log('⚠ SysEx NOT enabled - browser may have denied permission (ignore)');
-    }
   
     const outputs = midiAccess.outputs.values();
     log('Available MIDI outputs:');
@@ -151,7 +143,7 @@ function sendSustainOff() {
   log(`→ Sustain OFF (CC 64 = 0): channel=${channel}`);
 }
 
-// Chord Playing
+// Chords
 
 const chordIntervals = {
   major: [0, 4, 7],
@@ -201,6 +193,8 @@ function releaseAllChordNotes() {
   log('→ Released all active notes');
 }
 
+// Transport
+
 function sendPlay() {
   if (!bitwigPort) {
     log('Port not initialized');
@@ -219,22 +213,13 @@ function sendStop() {
   log('→ Transport: STOP');
 }
 
-function sendPause() {
+function sendContinue() {
   if (!bitwigPort) {
     log('Port not initialized');
     return;
   }
-  bitwigPort.send([0xFB]);  // MIDI Continue (closest to pause)
+  bitwigPort.send([0xFB]);  // MIDI Continue
   log('→ Transport: CONTINUE');
-}
-
-function sendRecord() {
-  if (!bitwigPort) {
-    log('Port not initialized');
-    return;
-  }
-  // No standard MIDI message for record, but some DAWs respond to note on specific channel
-  log('⚠ No standard MIDI record command (use MMC with SysEx)');
 }
 
 // Custom CC
