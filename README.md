@@ -8,7 +8,7 @@ I used Windows and Bitwig:-
 - Start Bitwig which auto-detects the port as a controller. Or at least it did in my case; you may need to add it manually.
 - Start the playground: https://op12no2.github.io/webmidi_playground/ 
 
-Or run it locally:-
+Or clone the repo and run it locally:-
 ```
 cd webmidi_playground
 python -m http.server 8000
