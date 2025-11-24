@@ -16,7 +16,7 @@ python -m http.server 8000
 http://localhost:8000
 ```
 
-There is also a little test for the webmidi.js library here:-
+There is also a little test using the webmidi.js library here:-
 
 https://op12no2.github.io/webmidi_test/webmidijs.html 
 
